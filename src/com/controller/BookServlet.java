@@ -1,6 +1,7 @@
 package com.controller;
 
 import com.entity.Book;
+import com.entity.Borrow;
 import com.entity.Reader;
 import com.service.BookService;
 import com.service.impl.BookServiceImpl;
@@ -21,12 +22,14 @@ public class BookServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String method = req.getParameter("method");
+        String pageStr = req.getParameter("page");
+        Integer page = Integer.parseInt(pageStr);
+        HttpSession session = req.getSession();
+        Reader reader = (Reader) session.getAttribute("reader");
         if (method == null)
             method = "findAll";
         switch (method) {
             case "findAll":
-                String pageStr = req.getParameter("page");
-                Integer page = Integer.parseInt(pageStr);
                 List<Book> books = bookService.findAll(page);
                 req.setAttribute("list", books);
                 req.setAttribute("dataPrePage", 6);
@@ -37,10 +40,22 @@ public class BookServlet extends HttpServlet {
             case "addBorrow":
                 String bookidStr = req.getParameter("bookid");
                 Integer bookid = Integer.parseInt(bookidStr);
-                HttpSession session = req.getSession();
-                Reader reader = (Reader) session.getAttribute("reader");
+                //添加借书请求
                 bookService.addBorrow(bookid, reader.getId());
+                resp.sendRedirect("/book?method=findAllBorrow&page=1");
                 break;
+            case "findAllBorrow":
+                //展示当前用户的所有借书记录
+                List<Borrow> borrows = bookService.findAllBorrowByReaderId(reader.getId(), page);
+                req.setAttribute("list", borrows);
+                req.setAttribute("dataPrePage", 6);
+                req.setAttribute("currentPage", page);
+                req.setAttribute("pages", bookService.getBorrowedPages(reader.getId()));
+                req.getRequestDispatcher("borrow.jsp").forward(req, resp);
+                break;
+//            case "handle":
+//                //根据借书状态查询
+//                break;
 
         }
 

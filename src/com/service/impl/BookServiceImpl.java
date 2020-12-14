@@ -1,6 +1,7 @@
 package com.service.impl;
 
 import com.entity.Book;
+import com.entity.Borrow;
 import com.repository.BookRepository;
 import com.repository.BorrowRepository;
 import com.repository.impl.BookRepositoryImpl;
@@ -35,6 +36,28 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    public int getBorrowedPages(Integer readid) {
+        int count = borrowRepository.count(readid);
+        int page = 0;
+        if (count % LIMIT == 0)
+            page = count / LIMIT;
+        else
+            page = count / LIMIT + 1;
+        return page;
+    }
+
+    @Override
+    public int getBorrowedPagesByState(Integer state) {
+        int count = borrowRepository.countByState(state);
+        int page = 0;
+        if (count % LIMIT == 0)
+            page = count / LIMIT;
+        else
+            page = count / LIMIT + 1;
+        return page;
+    }
+
+    @Override
     public void addBorrow(Integer bookid, Integer readid) {
         //借书时间
         Date data1 = new Date();
@@ -53,7 +76,22 @@ public class BookServiceImpl implements BookService {
         borrowRepository.insert(bookid, readid, borrowDate, returnDate, null, 0);
     }
 
-//    public static void main(String[] args) {
+    @Override
+    public List<Borrow> findAllBorrowByReaderId(Integer id, Integer page) {
+        return borrowRepository.findAllByReaderId(id, (page - 1) * LIMIT, LIMIT);
+    }
+
+    @Override
+    public List<Borrow> findAllBorrowWithoutAdmit(Integer state, Integer page) {
+        return borrowRepository.findAllByState(state, (page - 1) * LIMIT, LIMIT);
+    }
+
+    @Override
+    public void handleBorrow(Integer borrowId, Integer state, Integer adminId) {
+        borrowRepository.handle(borrowId, state, adminId);
+    }
+
+    //    public static void main(String[] args) {
 //        Date data1 = new Date();
 //        SimpleDateFormat simpleDateFormat1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 //        SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("YYYY-MM-DD HH:mm:ss");

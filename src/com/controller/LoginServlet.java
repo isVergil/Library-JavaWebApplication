@@ -2,6 +2,7 @@ package com.controller;
 
 import com.entity.Admin;
 import com.entity.Book;
+import com.entity.Borrow;
 import com.entity.Reader;
 import com.service.BookService;
 import com.service.LoginService;
@@ -15,13 +16,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.List;
 
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
 
     private LoginService loginService = new LoginServiceImpl();
-    private BookService bookService = new BookServiceImpl();
 
     /**
      * 处理登录的业务逻辑
@@ -48,7 +47,8 @@ public class LoginServlet extends HttpServlet {
                 case "admin":
                     Admin admin = (Admin) object;
                     session.setAttribute("admin", admin);
-                    //跳转 Admin 首页
+                    //跳转 Admin 首页   Model
+                    resp.sendRedirect("/admin?method=findAllBorrow&page=1");
                     break;
             }
         } else {

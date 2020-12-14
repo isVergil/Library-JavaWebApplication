@@ -74,4 +74,10 @@ public class Book {
         this.price = price;
         this.bookCase = bookCase;
     }
+
+    public Book(String name, String author, String publish) {
+        this.name = name;
+        this.author = author;
+        this.publish = publish;
+    }
 }
